@@ -1,41 +1,42 @@
-include <iostream>
-#include <unistd.h>	#include <unistd.h>
-#include <cerrno>    	#include <cerrno>
-#include <cstdlib>   	#include <cstdlib>
-#include <sys/wait.h>	#include <sys/wait.h>
+#include <iostream>
+#include <unistd.h>
+#include <cerrno>
+#include <cstdlib>
+#include <sys/wait.h>
 #include "CLI11.hpp"
 
-using namespace std;	using namespace std;
-int main(){	
-  auto pid{fork()};	int main()
-  if (pid == -1){	{
-    cerr << "forking failed : " << errno << endl;	  int i = 1;
-    exit(EXIT_FAILURE);	  while (i < 5)
-  }	  {
+using namespace std;
+
+void print_process(){
+  cout << "I am Prozess: " << getpid() << endl;
+  cout << "parent id is " << getppid() << endl;
+  
+}
+
+int main(){
+
+  int i = 1;
 
 
-  if (pid == 0){	    auto pid{fork()};
-    cout << "child process here !"<< endl;	    if (pid == -1)
-    cout << "child pid is " << getpid() << endl;	    {
-    cout << "parent id is " << getppid() << endl;	      cerr << "forking failed : " << errno << endl;
-    sleep(3);	      exit(EXIT_FAILURE);
-    quick_exit(EXIT_SUCCESS);	    }
-  } else {	
-    cout << "child pid is " << pid << endl;	    if (pid == 0)
-    cout << "waiting for child..." << endl;	    {
-    int status;	      cout << "I am Prozess: "<< i << endl;
-    waitpid(pid, &status, 0); // 0...options	      cout << "parent id is " << getppid() << endl;
-    cout << "child terminated w / exit code " << status << endl;	      sleep(3);
-    exit(EXIT_SUCCESS);	      quick_exit(EXIT_SUCCESS);
+  while (i < 3)
+  {
+    auto pid{fork()};
+    if (pid == -1){
+      cerr << "forking failed : " << errno << endl;
+      exit(EXIT_FAILURE);
     }
-    else
-    {
-      cout << "child pid is " << pid << endl;
+
+    if (pid == 0){
+      print_process();
+      sleep(1);
+      quick_exit(EXIT_SUCCESS);
+    }
+    else {
+    
       int status;
       waitpid(pid, &status, 0);
-      cout << "child terminated w / exit code " << status << endl;
-
+      //cout << "child terminated w / exit code " << status << endl;
     }
     i++;
-  }	  }
-} 	} 
+  }
+}
