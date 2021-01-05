@@ -13,31 +13,65 @@ void print_process()
   cout << "parent id is " << getppid() << endl;
   cout << endl;
 }
-void fork_process(int n)
+void fork_process(int n, int m, int depth)
 {
-  int i = 0;
-
-  while (i < n)
+  if (depth == 0)
   {
-    auto pid{fork()};
-    if (pid == -1)
-    {
-      cerr << "forking failed : " << errno << endl;
-      exit(EXIT_FAILURE);
-    }
+    int i = 0;
 
-    if (pid == 0)
+    while (i < n)
     {
-      print_process();
-      sleep(1);
-      quick_exit(EXIT_SUCCESS);
+      auto pid{fork()};
+      if (pid == -1)
+      {
+        cerr << "forking failed : " << errno << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      if (pid == 0)
+      {
+        print_process();
+        fork_process(n, m, depth + 1);
+        sleep(1);
+        quick_exit(EXIT_SUCCESS);
+      }
+      else
+      {
+        int status;
+        waitpid(pid, &status, 0);
+      }
+      i++;
     }
-    else
+  }
+  else if (depth == 1)
+  {
+    int i = 0;
+  
+    while (i < m)
     {
-      int status;
-      waitpid(pid, &status, 0);
+      auto pid{fork()};
+      if (pid == -1)
+      {
+        cerr << "forking failed : " << errno << endl;
+        exit(EXIT_FAILURE);
+      }
+
+      if (pid == 0)
+      {
+        print_process();
+        fork_process(n, m, depth + 1);
+        sleep(1);
+        quick_exit(EXIT_SUCCESS);
+      }
+      else
+      {
+        int status;
+        waitpid(pid, &status, 0);
+      }
+      i++;
     }
-    i++;
+  } else {
+    return;
   }
 }
 
@@ -45,31 +79,5 @@ int main()
 {
   cout << "main process" << endl;
   print_process();
-  int i = 1;
-
-  while (i < 3)
-  {
-    auto pid{fork()};
-    if (pid == -1)
-    {
-      cerr << "forking failed : " << errno << endl;
-      exit(EXIT_FAILURE);
-    }
-
-    if (pid == 0)
-    {
-      print_process();
-      fork_process(2);
-      sleep(1);
-      quick_exit(EXIT_SUCCESS);
-    }
-    else
-    {
-
-      int status;
-      waitpid(pid, &status, 0);
-      //cout << "child terminated w / exit code " << status << endl;
-    }
-    i++;
-  }
+  fork_process(2, 3, 0);
 }
