@@ -14,13 +14,33 @@ using namespace std;
 int cnt1 = 1;
 int cnt2 = 1;
 
+void kill_helper(pid_t pid, int depth){
+  if(depth == 0){
+    int success = kill(pid, SIGKILL);
+    //cout << success << endl;
+    if(success == 0){
+      cout << "Kind " << pid << " wurde getötet!" << endl; 
+    }
+
+  }  else if (depth == 1){
+    int success = kill(pid, SIGKILL);
+    //cout << success << endl;
+    if(success == 0){
+      cout << "Blatt " << pid << " wurde getötet!" << endl; 
+
+
+
+  }
+}
+}
 void print_process(){
   cout << "I am Prozess: " << getpid() << endl;
   cout << "Parent id is : " << getppid() << endl;
   cout << endl;
 }
 void fork_process(int n, int m, int depth){
-  vector<pid_t> test;
+  vector<pid_t> children;
+  vector<pid_t> leaves;
   
   int i = 0;
   if (depth == 0) {
@@ -37,9 +57,8 @@ void fork_process(int n, int m, int depth){
         fork_process(n, m, depth + 1);
         sleep(5);
         //quick_exit(EXIT_SUCCESS);
-      } else {
-        
-        test.push_back(pid);
+      } else { 
+        children.push_back(pid);
         /*
         int status;
       
@@ -50,10 +69,12 @@ void fork_process(int n, int m, int depth){
       i++;
     }
     //main Prozess nach dem alle Prozesse erstellt wurden
+    int status;
     sleep(2);
-    for(size_t k = 0; k < test.size(); k++){
-      cout << kill(test[k], SIGKILL) << endl;
-      cout << test[k] << endl;
+    for(size_t k = 0; k < children.size(); k++){
+      kill_helper(children[k], depth);
+      cout << children[k] << endl;
+      waitpid(children[k], &status, 0);
       
     }
 
@@ -70,20 +91,25 @@ void fork_process(int n, int m, int depth){
         cout << cnt1 << "." << cnt2 << endl;
         print_process();
         fork_process(n, m, depth + 1);
-        quick_exit(EXIT_SUCCESS);
+        //quick_exit(EXIT_SUCCESS);
       } else {
+        /*
         int status;
         waitpid(pid, &status, 0);
-        test.push_back(pid);
+        */
+        leaves.push_back(pid);
       }
       i++;
       
     }
-    /*
-    for(size_t k = 0; k < test.size(); k++){
-         cout << test[k] << endl;
-    }*/
-
+    int status;
+    sleep(2);
+    for(size_t k = 0; k < leaves.size(); k++){
+      kill_helper(leaves[k], depth);
+      cout << leaves[k] << endl;
+      waitpid(leaves[k], &status, 0);
+      
+    }
   } else {
     return;
   }
