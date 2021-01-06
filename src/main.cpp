@@ -20,7 +20,7 @@ void print_process(){
   cout << endl;
 }
 void fork_process(int n, int m, int depth){
-  vector<int> test;
+  vector<pid_t> test;
   
   int i = 0;
   if (depth == 0) {
@@ -34,28 +34,28 @@ void fork_process(int n, int m, int depth){
         cnt1 += i;
         cout << cnt1 << endl;
         print_process();
-   
         fork_process(n, m, depth + 1);
-        quick_exit(EXIT_SUCCESS);
+        sleep(5);
+        //quick_exit(EXIT_SUCCESS);
       } else {
         
         test.push_back(pid);
-        
+        /*
         int status;
-        cout << "var: " << pid << endl;
+      
         waitpid(pid, &status, 0);
+        */
       }
       
       i++;
     }
     //main Prozess nach dem alle Prozesse erstellt wurden
-    cout << test.size() << endl;
+    sleep(2);
     for(size_t k = 0; k < test.size(); k++){
+      cout << kill(test[k], SIGKILL) << endl;
       cout << test[k] << endl;
+      
     }
-    cout << getpid();
-  
-
 
   }
   else if (depth == 1) {
@@ -74,9 +74,16 @@ void fork_process(int n, int m, int depth){
       } else {
         int status;
         waitpid(pid, &status, 0);
+        test.push_back(pid);
       }
       i++;
+      
     }
+    /*
+    for(size_t k = 0; k < test.size(); k++){
+         cout << test[k] << endl;
+    }*/
+
   } else {
     return;
   }
