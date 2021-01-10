@@ -20,9 +20,9 @@ using namespace std;
 int cnt1 = 1;
 int cnt2 = 1;
 vector<pid_t> children;
+auto logger = spdlog::basic_logger_mt("processTree_logger", "logs/log_processTree.txt");
 
 void signalHandler(int signal) {
-
  if(signal == 15){
   if (children.size() > 0){
     for(size_t c = 0; c < children.size(); c++){
@@ -50,6 +50,7 @@ void print_process(){
 }
 
 void fork_process(int n, int m, int depth) {
+
   int i = 0;
   if (depth == 0) {
     while (i < n) {
@@ -73,6 +74,7 @@ void fork_process(int n, int m, int depth) {
     }
     sleep(2);
     fmt::print(fg(fmt::color::gold), "Finished creating tree. \n \n \n");
+    logger->info("created tree");
     int status;
     for (size_t k = 0; k < children.size(); k++) {
       fmt::print(fg(fmt::color::light_blue), "Sending Signal to: {0}", children[k]);
@@ -91,6 +93,7 @@ void fork_process(int n, int m, int depth) {
       }
       if (pid == 0) {
         cnt2 += i;
+        
         fmt::print(fg(fmt::color::red), "{0}.{1} \n", cnt1, cnt2);
         print_process();
         sleep(50);
@@ -164,7 +167,7 @@ int main(int argc, char **argv) {
   int m;
   bool signalBool;
   bool logBool;
-  auto logger = spdlog::basic_logger_mt("processTree_logger", "logs/log_processTree.txt");
+
 
   app.add_option("children", n, "Number of children")->check(CLI::PositiveNumber);
   app.add_option("leaves", m, "Number of leaves")->check(CLI::PositiveNumber);
@@ -188,13 +191,12 @@ int main(int argc, char **argv) {
 
  
   if(signalBool){
+    logger->info("start programm with Signalkill option");
     fork_process(n, m, 0);
-    //logger->info("start programm with Signalkill option");
-
   } else {
+    logger->info("start programm with automatet killing");
     fork_process_auto(n, m, 0);
-    //logger->info("start programm with automatet killing");
   }
 
-
+ logger->info("Ended prgram sccesfully ");
 }
