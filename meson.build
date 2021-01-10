@@ -8,7 +8,9 @@ project('processTree', 'cpp',
 inc_dir = include_directories('include')
 
 src = ['src/main.cpp']
-
+add_global_arguments('-I' + get_option('cli11_include_dir'), language : 'cpp')
+add_global_arguments('-I' + get_option('fmt_include_dir'), language : 'cpp')
+add_global_arguments('-I' + get_option('spdlog_include_dir'), language : 'cpp')
 executable('processTree',
             sources : src,     
             dependencies : thread_dep,

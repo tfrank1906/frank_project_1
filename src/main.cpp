@@ -7,7 +7,13 @@
 #include <vector>
 #include <signal.h>
 #include <csignal>
+#include "fmt/core.h"
+#include "fmt/format.h"
+#include "fmt/format-inl.h"
+#include "format.cc"
+#include "fmt/color.h"
 #include "CLI11.hpp"
+#include "spdlog/sinks/basic_file_sink.h"
 
 using namespace std;
 
@@ -15,29 +21,30 @@ int cnt1 = 1;
 int cnt2 = 1;
 vector<pid_t> children;
 
-
-
 void signalHandler(int signal) {
 
  if(signal == 15){
   if (children.size() > 0){
     for(size_t c = 0; c < children.size(); c++){
-      cout << "killíng : " << children[c] << endl;
+      fmt::print(fg(fmt::color::green), "Process {1} here, got Signal, delegating it to leaf {0} \n \n", children[c], getpid());
       kill(children[c], SIGKILL);
+      fmt::print(fg(fmt::color::red), "{} killed because of signal \n \n", children[c]);
     }
   }
-  cout << "killing now: " << getpid() << endl;
+  fmt::print(fg(fmt::color::gold), "Finished killing leaves per signal. \n");
+  fmt::print(fg(fmt::color::red), "-> Now killing child {} \n \n \n", getpid());
   quick_exit(EXIT_SUCCESS);
     
   } else {
     cout << "Got bad signal!" << endl;
+    return;
   }
 }
 
 void print_process(){
-
-  cout << "I am Prozess  : " << getpid() << endl;
-  cout << "Id from my is : " << getppid() << endl;
+  fmt::print(fg(fmt::color::gray), "I am Process:         {} \n", getpid());
+  fmt::print(fg(fmt::color::gray), "Id from my parent is: {} \n ", getppid());
+  
   cout << endl;
 
 }
@@ -53,7 +60,7 @@ void fork_process(int n, int m, int depth) {
       }
       if (pid == 0) {
         cnt1 += i;
-        cout << cnt1 << endl;
+        fmt::print(fg(fmt::color::red), "{0} \n", cnt1);
         print_process();
         fork_process(n, m, depth + 1);
         sleep(50);
@@ -65,9 +72,13 @@ void fork_process(int n, int m, int depth) {
       i++;
     }
     sleep(2);
+    fmt::print(fg(fmt::color::gold), "Finished creating tree. \n \n \n");
     int status;
     for (size_t k = 0; k < children.size(); k++) {
+      fmt::print(fg(fmt::color::light_blue), "Sending Signal to: {0}", children[k]);
+      cout << endl;
       kill(children[k], SIGTERM);
+     
       waitpid(children[k], &status, 0);  
     }
   }
@@ -80,7 +91,7 @@ void fork_process(int n, int m, int depth) {
       }
       if (pid == 0) {
         cnt2 += i;
-        cout << cnt1 << "." << cnt2 << endl;
+        fmt::print(fg(fmt::color::red), "{0}.{1} \n", cnt1, cnt2);
         print_process();
         sleep(50);
       }
@@ -120,7 +131,6 @@ void fork_process_auto(int n, int m, int depth){
     }
   }
   else if (depth == 1) {
-   
     while (i < m) {
       auto pid{fork()};
       if (pid == -1) {
@@ -145,6 +155,7 @@ void fork_process_auto(int n, int m, int depth){
 
 
 int main(int argc, char **argv) {
+  
   signal(SIGTERM, signalHandler);
  
   CLI::App app{"Process Tree, project_1"};
@@ -153,20 +164,18 @@ int main(int argc, char **argv) {
   int m;
   bool signalBool;
 
-  app.add_option("children", n, "Number of children");
-  app.add_option("leaves", m, "Number of leaves");
+  app.add_option("children", n, "Number of children")->check(CLI::PositiveNumber);
+  app.add_option("leaves", m, "Number of leaves")->check(CLI::PositiveNumber);
   app.add_flag("--killsignal, --k", signalBool, "kill leaves with signal");
 
   CLI11_PARSE(app, argc, argv);
-
-  cout << "main process" << endl;
+  fmt::print("\nStart building process tree with {0} children and {1} leaves: \n\n", n, m);
+  fmt::print(fg(fmt::color::red), "Main Process \n");
   print_process();
 
   if(signalBool){
     fork_process(n, m, 0);
   } else {
-    fork_process_auto(2, 2, 0);
+    fork_process_auto(n, m, 0);
   }
-  
-
 }
