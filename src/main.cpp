@@ -165,16 +165,30 @@ int main(int argc, char **argv) {
 
   int n;
   int m;
-  bool signalBool;
+  bool signalBool = false;
   bool logBool;
+  bool experimentBool = false;
 
 
   app.add_option("children", n, "Number of children")->check(CLI::PositiveNumber);
   app.add_option("leaves", m, "Number of leaves")->check(CLI::PositiveNumber);
   app.add_flag("--killsignal, --k", signalBool, "kill leaves with signal");
   app.add_flag("--log, --l", logBool, "create a log");
+  app.add_flag("--experiment, --e", experimentBool, "Enter expiremental - Mode: unlimited Processes!");
 
   CLI11_PARSE(app, argc, argv);
+  if(experimentBool){
+    fmt::print(fg(fmt::color::red), "You are in experimental mode! Be careful! \n");
+    sleep(1);
+   
+  } else {
+    if(n > 6 && m > 6){
+    fmt::print(fg(fmt::color::red), "Too many Processes! \n");
+    fmt::print(fg(fmt::color::red), "Maximum is n = 5 and m = 5 \n");
+    fmt::print(fg(fmt::color::red), "If you want more processes: --e ! \n");
+    return 0;
+    }
+  }
 
    if(logBool){
     
