@@ -12,7 +12,7 @@ Tobias Frank
 ## Projektbeschreibung:
 ### Projektinhalt
 Das Projekt umfasst das Programm "processTree".
-Dieses erstellt Prozesse in einer Baumstruktur. Der Benutzer kann angeben wieviele Kinder der Hauptprozess haben soll und wieviele Kinder diese Kindprozesse haben sollen (Blätter des Baumes).
+Dieses erstellt Prozesse in einer Baumstruktur. Der Benutzer kann angeben wieviele Kinder der Hauptprozess haben soll und wieviele Kinder diese Kindprozesse haben sollen (Blätter des Baumes). Die beiden Werte dürfen nicht größer als 5 sein.
 
 Ein somit erstellter "Prozessbaum" besten immer aus 3 Ebenen:
 - Ebene mit Hauptprozess
@@ -30,11 +30,13 @@ Die zweite Art ist das der Hauptprozess an seine Kinder ein Signal an seine Kind
 
 ### Bedienung
 
-Zum Sarten des Programmes werden 2 Parameter gebraucht. Zusätzlich kann die Option `--k` bzw. `--killsignal` ergänzend mitgegeben werden.
+Zum Sarten des Programmes werden 2 Parameter gebraucht. Zusätzlich können verschiedene Optionen mitgegeben werden.
 
-`./processTree m n --killsignal`  
+`./processTree m n --killsignal --log --experiment`  
 
 - m: Anzahl der Kindprozesse
 - n: Anzahl der Blätterprozesse
 - killsignal: Gibt den Beendigungmechanismus an, wenn angegeben: mit Signal, sonst beendet sich selbst.
+- log: wenn angegeben, schreibt in log
+- experiment: lässt zu, dass man mehr als 5 Kinder mit 5 Blättern erstellt. (verlassen des safe - modes)
 
