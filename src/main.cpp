@@ -7,11 +7,8 @@
 #include <vector>
 #include <signal.h>
 #include <csignal>
-#include "fmt/core.h"
-#include "fmt/format.h"
-#include "fmt/format-inl.h"
-#include "format.cc"
-#include "fmt/color.h"
+#include "spdlog/fmt/fmt.h"
+#include "spdlog/fmt/bundled/color.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
 #include "CLI11.hpp"
@@ -167,6 +164,7 @@ int main(int argc, char **argv) {
   int m;
   bool signalBool;
   bool logBool;
+  auto logger = spdlog::basic_logger_mt("processTree_logger", "logs/log_processTree.txt");
 
   app.add_option("children", n, "Number of children")->check(CLI::PositiveNumber);
   app.add_option("leaves", m, "Number of leaves")->check(CLI::PositiveNumber);
@@ -176,13 +174,10 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
    if(logBool){
-    try {
-     auto logger = spdlog::basic_logger_mt("processTree_logger", "logs/log_processTree.txt");
+    
      fmt::print(fg(fmt::color::light_blue), "Writing logs... \n");
-    }
-    catch (const spdlog::spdlog_ex &ex){
-     std::cout << "Log init failes: " << ex.what() << endl;
-   }
+     logger->info("Welcome to processTree - logfile!");
+  
   } else {
     fmt::print(fg(fmt::color::light_blue), "Writing NO logs... \n");
   }
@@ -194,8 +189,11 @@ int main(int argc, char **argv) {
  
   if(signalBool){
     fork_process(n, m, 0);
+    //logger->info("start programm with Signalkill option");
+
   } else {
     fork_process_auto(n, m, 0);
+    //logger->info("start programm with automatet killing");
   }
 
 
