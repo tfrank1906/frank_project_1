@@ -13,8 +13,6 @@
 #include "spdlog/sinks/basic_file_sink.h"
 #include "CLI11.hpp"
 
-
-
 using namespace std;
 
 int cnt1 = 1;
@@ -44,9 +42,7 @@ void signalHandler(int signal) {
 void print_process(){
   fmt::print(fg(fmt::color::gray), "I am Process:         {} \n", getpid());
   fmt::print(fg(fmt::color::gray), "Id from my parent is: {} \n ", getppid());
-  
   cout << endl;
-
 }
 
 void fork_process(int n, int m, int depth) {
@@ -65,8 +61,7 @@ void fork_process(int n, int m, int depth) {
         print_process();
         fork_process(n, m, depth + 1);
         sleep(50);
-      }
-      else {
+      } else {
         children.push_back(pid);
       }
       sleep(1);
@@ -83,8 +78,7 @@ void fork_process(int n, int m, int depth) {
      
       waitpid(children[k], &status, 0);  
     }
-  }
-  else if (depth == 1) {
+  }  else if (depth == 1) {
     while (i < m) {
       auto pid{fork()};
       if (pid == -1) {
@@ -97,16 +91,13 @@ void fork_process(int n, int m, int depth) {
         fmt::print(fg(fmt::color::red), "{0}.{1} \n", cnt1, cnt2);
         print_process();
         sleep(50);
-      }
-      else {
+      } else {
         children.push_back(pid);
       }
       i++;
     }
     sleep(1);
-  }
-  else
-  {
+  } else {
     return;
   }
 }
@@ -132,8 +123,7 @@ void fork_process_auto(int n, int m, int depth){
       }
       i++;
     }
-  }
-  else if (depth == 1) {
+  } else if (depth == 1) {
     while (i < m) {
       auto pid{fork()};
       if (pid == -1) {
@@ -180,9 +170,8 @@ int main(int argc, char **argv) {
   if(experimentBool){
     fmt::print(fg(fmt::color::red), "You are in experimental mode! Be careful! \n");
     sleep(1);
-   
   } else {
-    if(n > 6 && m > 6){
+    if(n > 5 || m > 5){
     fmt::print(fg(fmt::color::red), "Too many Processes! \n");
     fmt::print(fg(fmt::color::red), "Maximum is n = 5 and m = 5 \n");
     fmt::print(fg(fmt::color::red), "If you want more processes: --e ! \n");
@@ -190,8 +179,7 @@ int main(int argc, char **argv) {
     }
   }
 
-   if(logBool){
-    
+  if(logBool){
      fmt::print(fg(fmt::color::light_blue), "Writing logs... \n");
      logger->info("Welcome to processTree - logfile!");
   
