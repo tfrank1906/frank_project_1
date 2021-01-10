@@ -12,8 +12,11 @@
 #include "fmt/format-inl.h"
 #include "format.cc"
 #include "fmt/color.h"
-#include "CLI11.hpp"
+#include "spdlog/spdlog.h"
 #include "spdlog/sinks/basic_file_sink.h"
+#include "CLI11.hpp"
+
+
 
 using namespace std;
 
@@ -163,19 +166,37 @@ int main(int argc, char **argv) {
   int n;
   int m;
   bool signalBool;
+  bool logBool;
 
   app.add_option("children", n, "Number of children")->check(CLI::PositiveNumber);
   app.add_option("leaves", m, "Number of leaves")->check(CLI::PositiveNumber);
   app.add_flag("--killsignal, --k", signalBool, "kill leaves with signal");
+  app.add_flag("--log, --l", logBool, "create a log");
 
   CLI11_PARSE(app, argc, argv);
+
+   if(logBool){
+    try {
+     auto logger = spdlog::basic_logger_mt("processTree_logger", "logs/log_processTree.txt");
+     fmt::print(fg(fmt::color::light_blue), "Writing logs... \n");
+    }
+    catch (const spdlog::spdlog_ex &ex){
+     std::cout << "Log init failes: " << ex.what() << endl;
+   }
+  } else {
+    fmt::print(fg(fmt::color::light_blue), "Writing NO logs... \n");
+  }
+
   fmt::print("\nStart building process tree with {0} children and {1} leaves: \n\n", n, m);
   fmt::print(fg(fmt::color::red), "Main Process \n");
   print_process();
 
+ 
   if(signalBool){
     fork_process(n, m, 0);
   } else {
     fork_process_auto(n, m, 0);
   }
+
+
 }
